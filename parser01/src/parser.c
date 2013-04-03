@@ -1,3 +1,6 @@
+// A simple parser of arithmetic expressions.
+// author: Osamu Kobayashi
+
 #include <stdio.h>
 #include <stdlib.h>
 
