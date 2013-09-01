@@ -39,59 +39,60 @@ void teardown()
     MockArduino_Destroy();
 }
 
-};
-
-TEST( MorseCode, ShowSentence_e )
+void checkTurnOn(
+    const char *sentence
+)
 {
-    unsigned long startMillis = 0;
-
-    MockArduino_setMillis( startMillis );
     MockArduino_Expect_digitalWrite( LED_PIN_NUMBER, HIGH );
-    morseCode->showSentence( "e" );
+    morseCode->showSentence( sentence );
     MockArduino_Verify_Complete();
+}
 
+void checkOnPeriod(
+    unsigned long startMillis,
+    unsigned long period
+)
+{
     MockArduino_setMillis( startMillis );
     morseCode->loop();
     MockArduino_Verify_Complete();
 
-    MockArduino_setMillis( startMillis + SHORT_CODE_PERIOD - 1 );
+    MockArduino_setMillis( startMillis + period - 1 );
     morseCode->loop();
     MockArduino_Verify_Complete();
 
-    MockArduino_setMillis( startMillis + SHORT_CODE_PERIOD );
+    MockArduino_setMillis( startMillis + period );
     MockArduino_Expect_digitalWrite( LED_PIN_NUMBER, LOW );
     morseCode->loop();
     MockArduino_Verify_Complete();
+}
 
+void checkFinished()
+{
     MockArduino_setMillis( UNSIGNED_LONG_MAX );
     morseCode->loop();
     MockArduino_Verify_Complete();
 }
 
+};
+
+TEST( MorseCode, ShowSentence_e )
+{
+    unsigned long startMillis = 0;
+    MockArduino_setMillis( startMillis );
+
+    checkTurnOn( "e"  );
+    checkOnPeriod( startMillis, SHORT_CODE_PERIOD );
+    checkFinished();
+}
+
 TEST( MorseCode, ShowSentence_t )
 {
     unsigned long startMillis = 0;
-
     MockArduino_setMillis( startMillis );
-    MockArduino_Expect_digitalWrite( LED_PIN_NUMBER, HIGH );
-    morseCode->showSentence( "t" );
-    MockArduino_Verify_Complete();
 
-    MockArduino_setMillis( startMillis );
-    morseCode->loop();
-    MockArduino_Verify_Complete();
-
-    MockArduino_setMillis( startMillis + LONG_CODE_PERIOD - 1 );
-    morseCode->loop();
-    MockArduino_Verify_Complete();
-
-    MockArduino_setMillis( startMillis + LONG_CODE_PERIOD );
-    MockArduino_Expect_digitalWrite( LED_PIN_NUMBER, LOW );
-    morseCode->loop();
-    MockArduino_Verify_Complete();
-
-    MockArduino_setMillis( UNSIGNED_LONG_MAX );
-    morseCode->loop();
-    MockArduino_Verify_Complete();
+    checkTurnOn( "t"  );
+    checkOnPeriod( startMillis, LONG_CODE_PERIOD );
+    checkFinished();
 }
 
