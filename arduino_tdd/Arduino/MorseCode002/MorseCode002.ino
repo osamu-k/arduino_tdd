@@ -1,46 +1,30 @@
-/*
-  Blink
-  Turns on an LED on for one second, then off for one second, repeatedly.
- 
-  This example code is in the public domain.
- */
- 
-// Pin 13 has an LED connected on most Arduino boards.
-// give it a name:
-int led = 13;
+#include "MorseCode.h"
 
-int period_on = 0;
-int period_off = 0;
-bool is_on = false;
-int time_last_changed = 0;
+#define LED_PIN_NUMBER 13
+#define LONG_CODE_PERIOD 600
+#define SHORT_CODE_PERIOD 200
+#define CODE_BOUNDARY_PERIOD 200
+#define CHARACTER_BOUNDARY_PERIOD 400
+#define WORD_BOUNDARY_PERIOD 1200
+
+MorseCode *morseCode = 0;
 
 // the setup routine runs once when you press reset:
 void setup() {                
-  // initialize the digital pin as an output.
-  pinMode(led, OUTPUT);     
+    pinMode( LED_PIN_NUMBER, OUTPUT );     
 
-  period_on = 1000;
-  period_off = 500;
-  is_on = false;
-  time_last_changed = millis();
+    morseCode = new MorseCode();
+    morseCode->setLedPinNumber( LED_PIN_NUMBER );
+    morseCode->setLongCodePeriod( LONG_CODE_PERIOD );
+    morseCode->setShortCodePeriod( SHORT_CODE_PERIOD );
+    morseCode->setCodeBoundaryPeriod( CODE_BOUNDARY_PERIOD );
+    morseCode->setCharacterBoundaryPeriod( CHARACTER_BOUNDARY_PERIOD );
+    morseCode->setWordBoundaryPeriod( WORD_BOUNDARY_PERIOD );
+
+    morseCode->showSentence( "t" );    
 }
 
 // the loop routine runs over and over again forever:
 void loop() {
-  unsigned long now = millis();
-  unsigned long period = now - time_last_changed;
-  if( is_on ){
-    if( period >= period_on ){
-      is_on = false;
-      time_last_changed = now;
-      digitalWrite( led, LOW );
-    }
-  }
-  else{
-    if( period >= period_off ){
-      is_on = true;
-      time_last_changed = now;
-      digitalWrite( led, HIGH );
-    }
-  }
+    morseCode->loop();
 }

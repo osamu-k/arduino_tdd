@@ -36,6 +36,7 @@ private:
     };
     Status m_status;
     unsigned long m_lastTimeTurned;
+    unsigned long m_period;
 };
 
 #endif

@@ -10,6 +10,7 @@ MorseCode::MorseCode()
     , m_wordBoundaryPeriod(0)
     , m_status(STATUS_IDLE)
     , m_lastTimeTurned(0)
+    , m_period(0)
 {
 }
 
@@ -49,7 +50,19 @@ void MorseCode::setWordBoundaryPeriod( unsigned long period )
 
 void MorseCode::showSentence( const char *sentence )
 {
-    (void)sentence;
+    size_t length = strlen( sentence );
+    if( length == 0 ) return;
+
+    if( sentence[0] == 'e' ){
+        m_period = m_shortCodePeriod;
+    }
+    else if( sentence[0] == 't' ){
+        m_period = m_longCodePeriod;
+    }
+    else{
+        return;
+    }
+    
     m_lastTimeTurned = millis();
     m_status = STATUS_ON;
     digitalWrite( m_pinNumber, HIGH );
@@ -74,7 +87,7 @@ void MorseCode::loop()
 void MorseCode::checkTurnOff()
 {
     unsigned long now = millis();
-    if( now >= (m_lastTimeTurned + m_shortCodePeriod) ){
+    if( now >= (m_lastTimeTurned + m_period) ){
         digitalWrite( m_pinNumber, LOW );
         m_lastTimeTurned = 0;
         m_status = STATUS_IDLE;

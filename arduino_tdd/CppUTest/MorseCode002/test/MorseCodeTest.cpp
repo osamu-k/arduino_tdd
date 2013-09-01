@@ -68,3 +68,30 @@ TEST( MorseCode, ShowSentence_e )
     MockArduino_Verify_Complete();
 }
 
+TEST( MorseCode, ShowSentence_t )
+{
+    unsigned long startMillis = 0;
+
+    MockArduino_setMillis( startMillis );
+    MockArduino_Expect_digitalWrite( LED_PIN_NUMBER, HIGH );
+    morseCode->showSentence( "t" );
+    MockArduino_Verify_Complete();
+
+    MockArduino_setMillis( startMillis );
+    morseCode->loop();
+    MockArduino_Verify_Complete();
+
+    MockArduino_setMillis( startMillis + LONG_CODE_PERIOD - 1 );
+    morseCode->loop();
+    MockArduino_Verify_Complete();
+
+    MockArduino_setMillis( startMillis + LONG_CODE_PERIOD );
+    MockArduino_Expect_digitalWrite( LED_PIN_NUMBER, LOW );
+    morseCode->loop();
+    MockArduino_Verify_Complete();
+
+    MockArduino_setMillis( UNSIGNED_LONG_MAX );
+    morseCode->loop();
+    MockArduino_Verify_Complete();
+}
+
