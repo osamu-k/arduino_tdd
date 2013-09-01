@@ -43,7 +43,7 @@ void teardown()
 
 TEST( MorseCode, ShowSentence_e )
 {
-    unsigned long startMillis = 1000;
+    unsigned long startMillis = 0;
 
     MockArduino_setMillis( startMillis );
     MockArduino_Expect_digitalWrite( LED_PIN_NUMBER, HIGH );
