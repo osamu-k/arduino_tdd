@@ -19,6 +19,10 @@ public:
     void loop();
 
 private:
+    void showNextCharacter();
+    void showNextCode();
+    void turnOn( unsigned long startMillis, unsigned long period );
+    const char *characterCode( char c );
     void checkTurnOff();
     void checkTurnOn();
 
@@ -37,6 +41,10 @@ private:
     Status m_status;
     unsigned long m_lastTimeTurned;
     unsigned long m_period;
+    const char *m_sentence;
+    unsigned int m_sentenceIndex;
+    const char *m_currentCode;
+    unsigned int m_currentCodeIndex;
 };
 
 #endif

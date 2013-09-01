@@ -72,7 +72,7 @@ static void expectationStringDigitalWright(
     char buff[128];
     sprintf( buff, "digitalWright(%d,%s)",
         expectation->parameters.digitalWright.pin_number,
-        expectation->parameters.digitalWright.level == 0 ? "LOW" : "HIGHT"
+        expectation->parameters.digitalWright.level == 0 ? "LOW" : "HIGH"
     );
     strncat( buffer, buff, maxLength );
 }
@@ -123,7 +123,7 @@ static void unexpectedDigitalWright( int pin_number, int level )
     char message[128];
     sprintf( message, 
         "unexpected call 'digitalWright(%d,%s)'",
-        pin_number, (level == 0) ? "LOW" : "HIGHT" );
+        pin_number, (level == 0) ? "LOW" : "HIGH" );
     FAIL_TEXT_C( message );
 } 
 

@@ -11,6 +11,10 @@ MorseCode::MorseCode()
     , m_status(STATUS_IDLE)
     , m_lastTimeTurned(0)
     , m_period(0)
+    , m_sentence(0)
+    , m_sentenceIndex(0)
+    , m_currentCode(0)
+    , m_currentCodeIndex(0)
 {
 }
 
@@ -50,6 +54,12 @@ void MorseCode::setWordBoundaryPeriod( unsigned long period )
 
 void MorseCode::showSentence( const char *sentence )
 {
+    if( sentence == 0 ) return;
+    m_sentence = sentence;
+    m_sentenceIndex = 0;
+    showNextCharacter();
+    
+#if 0
     size_t length = strlen( sentence );
     if( length == 0 ) return;
 
@@ -66,6 +76,71 @@ void MorseCode::showSentence( const char *sentence )
     m_lastTimeTurned = millis();
     m_status = STATUS_ON;
     digitalWrite( m_pinNumber, HIGH );
+#endif
+}
+
+void MorseCode::showNextCharacter()
+{
+    if( m_sentenceIndex >= strlen(m_sentence) ){
+        m_status = STATUS_IDLE;
+        return;
+    }
+    m_currentCode = characterCode( m_sentence[m_sentenceIndex++] );
+    m_currentCodeIndex = 0;
+    showNextCode();
+}
+
+void MorseCode::showNextCode()
+{
+    if( m_currentCodeIndex >= strlen(m_currentCode) ){
+        return;
+    }
+    unsigned long now = millis();
+    switch( m_currentCode[m_currentCodeIndex++] ){
+    case '.':
+        turnOn( now, m_shortCodePeriod );
+        break;
+    case '_':
+        turnOn( now, m_longCodePeriod );
+        break;
+    break;
+        break;
+    }
+}
+
+void MorseCode::turnOn(
+    unsigned long startMillis,
+    unsigned long period
+)
+{
+    m_lastTimeTurned = startMillis;
+    m_period = period;
+    m_status = STATUS_ON;
+    digitalWrite( m_pinNumber, HIGH );
+}
+
+const char *MorseCode::characterCode(
+    char c
+)
+{
+    const char *code = "";
+    switch( c ){
+    case 'a':
+        code = "._";
+        break;
+    case 'b':
+        code = "_...";
+        break;
+    case 'e':
+        code = ".";
+        break;
+    case 't':
+        code = "_";
+        break;
+    default:
+        break;
+    }
+    return code;
 }
 
 void MorseCode::loop()
@@ -87,14 +162,35 @@ void MorseCode::loop()
 void MorseCode::checkTurnOff()
 {
     unsigned long now = millis();
-    if( now >= (m_lastTimeTurned + m_period) ){
-        digitalWrite( m_pinNumber, LOW );
+    if( now < (m_lastTimeTurned + m_period) ) return;
+
+    digitalWrite( m_pinNumber, LOW );
+
+    if( m_currentCodeIndex < strlen( m_currentCode ) ){
+        m_lastTimeTurned = now;
+        m_period = m_codeBoundaryPeriod;
+        m_status = STATUS_OFF;
+    }
+    else{
         m_lastTimeTurned = 0;
+        m_period = 0;
         m_status = STATUS_IDLE;
     }
 }
 
 void MorseCode::checkTurnOn()
 {
+    unsigned long now = millis();
+    if( now < (m_lastTimeTurned + m_period) ) return;
+    if( m_currentCodeIndex >= strlen( m_currentCode ) ) return;
+
+    showNextCode();
+#if 0
+
+    digitalWrite( m_pinNumber, HIGH );
+
+    m_lastTimeTurned = now;
+    m_status = STATUS_ON;
+#endif
 }
 

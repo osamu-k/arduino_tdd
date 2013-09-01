@@ -67,6 +67,25 @@ void checkOnPeriod(
     MockArduino_Verify_Complete();
 }
 
+void checkOffPeriod(
+    unsigned long startMillis,
+    unsigned long period
+)
+{
+    MockArduino_setMillis( startMillis );
+    morseCode->loop();
+    MockArduino_Verify_Complete();
+
+    MockArduino_setMillis( startMillis + period - 1 );
+    morseCode->loop();
+    MockArduino_Verify_Complete();
+
+    MockArduino_setMillis( startMillis + period );
+    MockArduino_Expect_digitalWrite( LED_PIN_NUMBER, HIGH );
+    morseCode->loop();
+    MockArduino_Verify_Complete();
+}
+
 void checkFinished()
 {
     MockArduino_setMillis( UNSIGNED_LONG_MAX );
@@ -81,7 +100,7 @@ TEST( MorseCode, ShowSentence_e )
     unsigned long startMillis = 0;
     MockArduino_setMillis( startMillis );
 
-    checkTurnOn( "e"  );
+    checkTurnOn( "e" );
     checkOnPeriod( startMillis, SHORT_CODE_PERIOD );
     checkFinished();
 }
@@ -91,8 +110,44 @@ TEST( MorseCode, ShowSentence_t )
     unsigned long startMillis = 0;
     MockArduino_setMillis( startMillis );
 
-    checkTurnOn( "t"  );
+    checkTurnOn( "t" );
     checkOnPeriod( startMillis, LONG_CODE_PERIOD );
+    checkFinished();
+}
+
+TEST( MorseCode, ShowSentence_a )
+{
+    unsigned long startMillis = 0;
+    MockArduino_setMillis( startMillis );
+
+    checkTurnOn( "a" );
+    checkOnPeriod( startMillis, SHORT_CODE_PERIOD );
+    startMillis += SHORT_CODE_PERIOD;
+    checkOffPeriod( startMillis, CODE_BOUNDARY_PERIOD );
+    startMillis += CODE_BOUNDARY_PERIOD;
+    checkOnPeriod( startMillis, LONG_CODE_PERIOD );
+    checkFinished();
+}
+
+TEST( MorseCode, ShowSentence_b )
+{
+    unsigned long startMillis = 0;
+    MockArduino_setMillis( startMillis );
+
+    checkTurnOn( "b" );
+    checkOnPeriod( startMillis, LONG_CODE_PERIOD );
+    startMillis += LONG_CODE_PERIOD;
+    checkOffPeriod( startMillis, CODE_BOUNDARY_PERIOD );
+    startMillis += CODE_BOUNDARY_PERIOD;
+    checkOnPeriod( startMillis, SHORT_CODE_PERIOD );
+    startMillis += SHORT_CODE_PERIOD;
+    checkOffPeriod( startMillis, CODE_BOUNDARY_PERIOD );
+    startMillis += CODE_BOUNDARY_PERIOD;
+    checkOnPeriod( startMillis, SHORT_CODE_PERIOD );
+    startMillis += SHORT_CODE_PERIOD;
+    checkOffPeriod( startMillis, CODE_BOUNDARY_PERIOD );
+    startMillis += CODE_BOUNDARY_PERIOD;
+    checkOnPeriod( startMillis, SHORT_CODE_PERIOD );
     checkFinished();
 }
 
