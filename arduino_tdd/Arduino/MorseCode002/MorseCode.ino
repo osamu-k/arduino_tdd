@@ -68,7 +68,8 @@ void MorseCode::showNextCharacter()
         m_status = STATUS_IDLE;
         return;
     }
-    m_currentCode = MorseCodeTable::codeForCharacter( m_sentence[m_sentenceIndex++] );
+    char nextChar = m_sentence[m_sentenceIndex++];
+    m_currentCode = MorseCodeTable::codeForCharacter( nextChar );
     m_currentCodeIndex = 0;
     showNextCode();
 }
@@ -101,30 +102,6 @@ void MorseCode::turnOn(
     digitalWrite( m_pinNumber, HIGH );
 }
 
-const char *MorseCode::characterCode(
-    char c
-)
-{
-    const char *code = "";
-    switch( c ){
-    case 'a':
-        code = "._";
-        break;
-    case 'b':
-        code = "_...";
-        break;
-    case 'e':
-        code = ".";
-        break;
-    case 't':
-        code = "_";
-        break;
-    default:
-        break;
-    }
-    return code;
-}
-
 void MorseCode::loop()
 {
     switch( m_status ){
@@ -154,9 +131,17 @@ void MorseCode::checkTurnOff()
         m_status = STATUS_OFF;
     }
     else if( m_sentenceIndex < strlen(m_sentence) ){
-        m_lastTimeTurned = now;
-        m_period = m_characterBoundaryPeriod;
-        m_status = STATUS_OFF;
+        if( m_sentence[m_sentenceIndex] == ' ' ){
+            m_lastTimeTurned = now;
+            m_period = m_wordBoundaryPeriod;
+            m_status = STATUS_OFF;
+            m_sentenceIndex ++;
+        }
+        else{
+            m_lastTimeTurned = now;
+            m_period = m_characterBoundaryPeriod;
+            m_status = STATUS_OFF;
+        }
     }
     else{
         m_lastTimeTurned = 0;

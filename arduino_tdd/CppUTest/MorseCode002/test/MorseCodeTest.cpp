@@ -1,15 +1,16 @@
 #include "CppUTest/TestHarness.h"
 #include "MorseCode.h"
 #include "MockArduino.h"
+#include <string.h>
 
 #define MAX_EXPECTATIONS 100
 
 #define LED_PIN_NUMBER 13
 #define LONG_CODE_PERIOD 600
 #define SHORT_CODE_PERIOD 200
-#define CODE_BOUNDARY_PERIOD 200
-#define CHARACTER_BOUNDARY_PERIOD 400
-#define WORD_BOUNDARY_PERIOD 1200
+#define CODE_BOUNDARY_PERIOD 300
+#define CHARACTER_BOUNDARY_PERIOD 700
+#define WORD_BOUNDARY_PERIOD 1500
 
 #define UNSIGNED_LONG_MAX 0xffffffff
 
@@ -129,11 +130,19 @@ void checkSentence(
 
     checkTurnOn( sentence );
     for( const char **morse = sentenceInMorseCode; *morse != 0; morse ++ ){
-        if( morse > sentenceInMorseCode ){
-            checkOffPeriod( startMillis, CHARACTER_BOUNDARY_PERIOD );
-            startMillis += CHARACTER_BOUNDARY_PERIOD;
+        if( strcmp( *morse, " " ) != 0 ){
+            if( morse > sentenceInMorseCode ){
+                if( strcmp( *(morse -1), " " ) == 0 ){
+                    checkOffPeriod( startMillis, WORD_BOUNDARY_PERIOD );
+                    startMillis += WORD_BOUNDARY_PERIOD;
+                }
+                else{
+                    checkOffPeriod( startMillis, CHARACTER_BOUNDARY_PERIOD );
+                    startMillis += CHARACTER_BOUNDARY_PERIOD;
+                }
+            }
+            checkCodeSequence( startMillis, *morse );
         }
-        checkCodeSequence( startMillis, *morse );
     }
 
     checkFinished();
@@ -204,5 +213,20 @@ TEST( MorseCode, ShowSentence_abc )
         0
     };
     checkSentence( "abc", sentenceInMorseCode );
+}
+
+TEST( MorseCode, ShowSentence_abc_xyz )
+{
+    const char *sentenceInMorseCode[] = {
+        ".-",
+        "-...",
+        "-.-.",
+        " ",
+        "-..-",
+        "-.--",
+        "--..",
+        0
+    };
+    checkSentence( "abc xyz", sentenceInMorseCode );
 }
 
