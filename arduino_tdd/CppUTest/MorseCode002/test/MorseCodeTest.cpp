@@ -87,7 +87,7 @@ void checkOffPeriod(
 }
 
 void checkCodeSequence(
-    unsigned long startMillis,
+    unsigned long &startMillis,
     const char *codeSequence
 )
 {
@@ -121,45 +121,88 @@ void checkFinished()
 
 void checkSentence(
     const char *sentence,
-    const char *code
+    const char *sentenceInMorseCode[]
 )
 {
     unsigned long startMillis = 0;
     MockArduino_setMillis( startMillis );
 
     checkTurnOn( sentence );
-    checkCodeSequence( startMillis, code );
+    for( const char **morse = sentenceInMorseCode; *morse != 0; morse ++ ){
+        if( morse > sentenceInMorseCode ){
+            checkOffPeriod( startMillis, CHARACTER_BOUNDARY_PERIOD );
+            startMillis += CHARACTER_BOUNDARY_PERIOD;
+        }
+        checkCodeSequence( startMillis, *morse );
+    }
+
     checkFinished();
 }
+
 };
 
 TEST( MorseCode, ShowSentence_e )
 {
-    checkSentence( "e", "." );
+    const char *sentenceInMorseCode[] = {
+        ".",
+        0
+    };
+    checkSentence( "e", sentenceInMorseCode );
 }
 
 TEST( MorseCode, ShowSentence_t )
 {
-    checkSentence( "t", "-" );
+    const char *sentenceInMorseCode[] = {
+        "-",
+        0
+    };
+    checkSentence( "t", sentenceInMorseCode );
 }
 
 TEST( MorseCode, ShowSentence_a )
 {
-    checkSentence( "a", ".-" );
+    const char *sentenceInMorseCode[] = {
+        ".-",
+        0
+    };
+    checkSentence( "a", sentenceInMorseCode );
 }
 
 TEST( MorseCode, ShowSentence_b )
 {
-    checkSentence( "b", "-..." );
+    const char *sentenceInMorseCode[] = {
+        "-...",
+        0
+    };
+    checkSentence( "b", sentenceInMorseCode );
 }
 
 TEST( MorseCode, ShowFirstCharacterInCodeTable )
 {
-    checkSentence( "1", ".----" );
+    const char *sentenceInMorseCode[] = {
+        ".----",
+        0
+    };
+    checkSentence( "1", sentenceInMorseCode );
 }
 
 TEST( MorseCode, ShowLastCharacterInCodeTable )
 {
-    checkSentence( ")", "-.--.-" );
+    const char *sentenceInMorseCode[] = {
+        "-.--.-",
+        0
+    };
+    checkSentence( ")", sentenceInMorseCode );
+}
+
+TEST( MorseCode, ShowSentence_abc )
+{
+    const char *sentenceInMorseCode[] = {
+        ".-",
+        "-...",
+        "-.-.",
+        0
+    };
+    checkSentence( "abc", sentenceInMorseCode );
 }
 

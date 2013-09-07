@@ -75,9 +75,8 @@ void MorseCode::showNextCharacter()
 
 void MorseCode::showNextCode()
 {
-    if( m_currentCodeIndex >= strlen(m_currentCode) ){
-        return;
-    }
+    if( m_currentCodeIndex >= strlen(m_currentCode) ) return;
+
     unsigned long now = millis();
     switch( m_currentCode[m_currentCodeIndex++] ){
     case '.':
@@ -154,6 +153,11 @@ void MorseCode::checkTurnOff()
         m_period = m_codeBoundaryPeriod;
         m_status = STATUS_OFF;
     }
+    else if( m_sentenceIndex < strlen(m_sentence) ){
+        m_lastTimeTurned = now;
+        m_period = m_characterBoundaryPeriod;
+        m_status = STATUS_OFF;
+    }
     else{
         m_lastTimeTurned = 0;
         m_period = 0;
@@ -165,8 +169,12 @@ void MorseCode::checkTurnOn()
 {
     unsigned long now = millis();
     if( now < (m_lastTimeTurned + m_period) ) return;
-    if( m_currentCodeIndex >= strlen( m_currentCode ) ) return;
 
-    showNextCode();
+    if( m_currentCodeIndex < strlen( m_currentCode ) ){
+        showNextCode();
+    }
+    else{
+        showNextCharacter();
+    }
 }
 

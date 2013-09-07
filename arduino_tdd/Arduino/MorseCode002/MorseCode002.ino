@@ -1,11 +1,11 @@
 #include "MorseCode.h"
 
 #define LED_PIN_NUMBER 13
-#define LONG_CODE_PERIOD 600
 #define SHORT_CODE_PERIOD 200
-#define CODE_BOUNDARY_PERIOD 200
-#define CHARACTER_BOUNDARY_PERIOD 400
-#define WORD_BOUNDARY_PERIOD 1200
+#define LONG_CODE_PERIOD (SHORT_CODE_PERIOD * 3)
+#define CODE_BOUNDARY_PERIOD SHORT_CODE_PERIOD
+#define CHARACTER_BOUNDARY_PERIOD (SHORT_CODE_PERIOD * 3)
+#define WORD_BOUNDARY_PERIOD (SHORT_CODE_PERIOD * 7)
 
 MorseCode *morseCode = 0;
 
@@ -21,7 +21,7 @@ void setup() {
     morseCode->setCharacterBoundaryPeriod( CHARACTER_BOUNDARY_PERIOD );
     morseCode->setWordBoundaryPeriod( WORD_BOUNDARY_PERIOD );
 
-    morseCode->showSentence( ")" );    
+    morseCode->showSentence( "abc" );    
 }
 
 // the loop routine runs over and over again forever:
