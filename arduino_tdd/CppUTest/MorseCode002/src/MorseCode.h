@@ -25,6 +25,7 @@ private:
     const char *characterCode( char c );
     void checkTurnOff();
     void checkTurnOn();
+    bool isLastCharacter();
 
     int m_pinNumber;
     unsigned long m_longCodePeriod;

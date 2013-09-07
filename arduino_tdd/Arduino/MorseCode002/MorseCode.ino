@@ -58,13 +58,16 @@ void MorseCode::showSentence( const char *sentence )
 {
     if( sentence == 0 ) return;
     m_sentence = sentence;
-    m_sentenceIndex = 0;
+    for( m_sentenceIndex = 0; 
+         (m_sentenceIndex < strlen(m_sentence)) && (m_sentence[m_sentenceIndex] == ' ');
+         m_sentenceIndex ++ ){
+    }
     showNextCharacter();
 }
 
 void MorseCode::showNextCharacter()
 {
-    if( m_sentenceIndex >= strlen(m_sentence) ){
+    if( isLastCharacter() ){
         m_status = STATUS_IDLE;
         return;
     }
@@ -130,12 +133,15 @@ void MorseCode::checkTurnOff()
         m_period = m_codeBoundaryPeriod;
         m_status = STATUS_OFF;
     }
-    else if( m_sentenceIndex < strlen(m_sentence) ){
+    else if( ! isLastCharacter() ){
         if( m_sentence[m_sentenceIndex] == ' ' ){
+            m_sentenceIndex ++;
+            while( (! isLastCharacter()) && (m_sentence[m_sentenceIndex] == ' ') ){
+                m_sentenceIndex ++;
+            }
             m_lastTimeTurned = now;
             m_period = m_wordBoundaryPeriod;
             m_status = STATUS_OFF;
-            m_sentenceIndex ++;
         }
         else{
             m_lastTimeTurned = now;
@@ -161,5 +167,15 @@ void MorseCode::checkTurnOn()
     else{
         showNextCharacter();
     }
+}
+
+bool MorseCode::isLastCharacter()
+{
+    for( unsigned int i = m_sentenceIndex; i < strlen(m_sentence); i++ ){
+        if( m_sentence[i] != ' ' ){
+            return false;
+        }
+    }
+    return true;
 }
 

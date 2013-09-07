@@ -230,3 +230,48 @@ TEST( MorseCode, ShowSentence_abc_xyz )
     checkSentence( "abc xyz", sentenceInMorseCode );
 }
 
+TEST( MorseCode, ShowSentence_abc___xyz )
+{
+    const char *sentenceInMorseCode[] = {
+        ".-",
+        "-...",
+        "-.-.",
+        " ",
+        "-..-",
+        "-.--",
+        "--..",
+        0
+    };
+    checkSentence( "abc   xyz", sentenceInMorseCode );
+}
+
+TEST( MorseCode, ShowSentence_abc_xyz___ )
+{
+    const char *sentenceInMorseCode[] = {
+        ".-",
+        "-...",
+        "-.-.",
+        " ",
+        "-..-",
+        "-.--",
+        "--..",
+        0
+    };
+    checkSentence( "abc xyz   ", sentenceInMorseCode );
+}
+
+TEST( MorseCode, ShowSentence___abc_xyz )
+{
+    const char *sentenceInMorseCode[] = {
+        ".-",
+        "-...",
+        "-.-.",
+        " ",
+        "-..-",
+        "-.--",
+        "--..",
+        0
+    };
+    checkSentence( "  abc xyz", sentenceInMorseCode );
+}
+

@@ -21,7 +21,7 @@ void setup() {
     morseCode->setCharacterBoundaryPeriod( CHARACTER_BOUNDARY_PERIOD );
     morseCode->setWordBoundaryPeriod( WORD_BOUNDARY_PERIOD );
 
-    morseCode->showSentence( "abc" );    
+    morseCode->showSentence( "   abc   xyz   " );    
 }
 
 // the loop routine runs over and over again forever:
