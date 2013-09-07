@@ -1,5 +1,7 @@
 #include "MorseCode.h"
+#include "MorseCodeTable.h"
 #include "Arduino.h"
+#include <string.h>
 
 MorseCode::MorseCode()
     : m_pinNumber(0)
@@ -58,25 +60,6 @@ void MorseCode::showSentence( const char *sentence )
     m_sentence = sentence;
     m_sentenceIndex = 0;
     showNextCharacter();
-    
-#if 0
-    size_t length = strlen( sentence );
-    if( length == 0 ) return;
-
-    if( sentence[0] == 'e' ){
-        m_period = m_shortCodePeriod;
-    }
-    else if( sentence[0] == 't' ){
-        m_period = m_longCodePeriod;
-    }
-    else{
-        return;
-    }
-    
-    m_lastTimeTurned = millis();
-    m_status = STATUS_ON;
-    digitalWrite( m_pinNumber, HIGH );
-#endif
 }
 
 void MorseCode::showNextCharacter()
@@ -85,7 +68,7 @@ void MorseCode::showNextCharacter()
         m_status = STATUS_IDLE;
         return;
     }
-    m_currentCode = characterCode( m_sentence[m_sentenceIndex++] );
+    m_currentCode = MorseCodeTable::codeForCharacter( m_sentence[m_sentenceIndex++] );
     m_currentCodeIndex = 0;
     showNextCode();
 }
@@ -100,7 +83,7 @@ void MorseCode::showNextCode()
     case '.':
         turnOn( now, m_shortCodePeriod );
         break;
-    case '_':
+    case '-':
         turnOn( now, m_longCodePeriod );
         break;
     break;
@@ -185,12 +168,5 @@ void MorseCode::checkTurnOn()
     if( m_currentCodeIndex >= strlen( m_currentCode ) ) return;
 
     showNextCode();
-#if 0
-
-    digitalWrite( m_pinNumber, HIGH );
-
-    m_lastTimeTurned = now;
-    m_status = STATUS_ON;
-#endif
 }
 

@@ -1,5 +1,7 @@
 #include "MorseCode.h"
+#include "MorseCodeTable.h"
 #include "Arduino.h"
+#include <string.h>
 
 MorseCode::MorseCode()
     : m_pinNumber(0)
@@ -85,7 +87,10 @@ void MorseCode::showNextCharacter()
         m_status = STATUS_IDLE;
         return;
     }
+    m_currentCode = MorseCodeTable::codeForCharacter( m_sentence[m_sentenceIndex++] );
+#if 0
     m_currentCode = characterCode( m_sentence[m_sentenceIndex++] );
+#endif
     m_currentCodeIndex = 0;
     showNextCode();
 }
@@ -100,7 +105,7 @@ void MorseCode::showNextCode()
     case '.':
         turnOn( now, m_shortCodePeriod );
         break;
-    case '_':
+    case '-':
         turnOn( now, m_longCodePeriod );
         break;
     break;

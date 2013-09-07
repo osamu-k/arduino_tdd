@@ -86,6 +86,32 @@ void checkOffPeriod(
     MockArduino_Verify_Complete();
 }
 
+void checkCodeSequence(
+    unsigned long startMillis,
+    const char *codeSequence
+)
+{
+    for( const char *cp = codeSequence; *cp != '\0'; cp++ ){
+        if( cp > codeSequence ){
+            checkOffPeriod( startMillis, CODE_BOUNDARY_PERIOD );
+            startMillis += CODE_BOUNDARY_PERIOD;
+        }
+        switch( *cp ){
+        case '.':
+            checkOnPeriod( startMillis, SHORT_CODE_PERIOD );
+            startMillis += SHORT_CODE_PERIOD;
+            break;
+        case '-':
+            checkOnPeriod( startMillis, LONG_CODE_PERIOD );
+            startMillis += LONG_CODE_PERIOD;
+            break;
+        default:
+            FAIL( "unexpected character in code sequence !" );
+            break;
+        }
+    }
+}
+
 void checkFinished()
 {
     MockArduino_setMillis( UNSIGNED_LONG_MAX );
@@ -93,61 +119,47 @@ void checkFinished()
     MockArduino_Verify_Complete();
 }
 
+void checkSentence(
+    const char *sentence,
+    const char *code
+)
+{
+    unsigned long startMillis = 0;
+    MockArduino_setMillis( startMillis );
+
+    checkTurnOn( sentence );
+    checkCodeSequence( startMillis, code );
+    checkFinished();
+}
 };
 
 TEST( MorseCode, ShowSentence_e )
 {
-    unsigned long startMillis = 0;
-    MockArduino_setMillis( startMillis );
-
-    checkTurnOn( "e" );
-    checkOnPeriod( startMillis, SHORT_CODE_PERIOD );
-    checkFinished();
+    checkSentence( "e", "." );
 }
 
 TEST( MorseCode, ShowSentence_t )
 {
-    unsigned long startMillis = 0;
-    MockArduino_setMillis( startMillis );
-
-    checkTurnOn( "t" );
-    checkOnPeriod( startMillis, LONG_CODE_PERIOD );
-    checkFinished();
+    checkSentence( "t", "-" );
 }
 
 TEST( MorseCode, ShowSentence_a )
 {
-    unsigned long startMillis = 0;
-    MockArduino_setMillis( startMillis );
-
-    checkTurnOn( "a" );
-    checkOnPeriod( startMillis, SHORT_CODE_PERIOD );
-    startMillis += SHORT_CODE_PERIOD;
-    checkOffPeriod( startMillis, CODE_BOUNDARY_PERIOD );
-    startMillis += CODE_BOUNDARY_PERIOD;
-    checkOnPeriod( startMillis, LONG_CODE_PERIOD );
-    checkFinished();
+    checkSentence( "a", ".-" );
 }
 
 TEST( MorseCode, ShowSentence_b )
 {
-    unsigned long startMillis = 0;
-    MockArduino_setMillis( startMillis );
+    checkSentence( "b", "-..." );
+}
 
-    checkTurnOn( "b" );
-    checkOnPeriod( startMillis, LONG_CODE_PERIOD );
-    startMillis += LONG_CODE_PERIOD;
-    checkOffPeriod( startMillis, CODE_BOUNDARY_PERIOD );
-    startMillis += CODE_BOUNDARY_PERIOD;
-    checkOnPeriod( startMillis, SHORT_CODE_PERIOD );
-    startMillis += SHORT_CODE_PERIOD;
-    checkOffPeriod( startMillis, CODE_BOUNDARY_PERIOD );
-    startMillis += CODE_BOUNDARY_PERIOD;
-    checkOnPeriod( startMillis, SHORT_CODE_PERIOD );
-    startMillis += SHORT_CODE_PERIOD;
-    checkOffPeriod( startMillis, CODE_BOUNDARY_PERIOD );
-    startMillis += CODE_BOUNDARY_PERIOD;
-    checkOnPeriod( startMillis, SHORT_CODE_PERIOD );
-    checkFinished();
+TEST( MorseCode, ShowFirstCharacterInCodeTable )
+{
+    checkSentence( "1", ".----" );
+}
+
+TEST( MorseCode, ShowLastCharacterInCodeTable )
+{
+    checkSentence( ")", "-.--.-" );
 }
 
